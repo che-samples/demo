@@ -2,9 +2,9 @@ schemaVersion: 2.1.0
 metadata:
   name: php-symfony
 components:
-  - name: php
+  - name: tools
     container:
-      image: quay.io/devfile/universal-developer-image:ubi8-latest
+      image: quay.io/devfile/universal-developer-image:ubi8-0e189d9
       endpoints:
         - exposure: public
           name: symfony
@@ -21,6 +21,7 @@ components:
   - name: composer
     volume:
       size: 512Mi
+
   - name: symfony
     volume:
       size: 512Mi
@@ -46,27 +47,29 @@ components:
       mountSources: false
   
 commands:
-  - id: install
+  - id: install-dependencies
     exec:
       label: "Install dependencies"
-      component: php
-      workingDir: ${PROJECTS_ROOT}/php-symfony
+      component: tools
+      workingDir: ${PROJECT_SOURCE}
       commandLine: "composer install && wget https://get.symfony.com/cli/installer -O - | bash"
       group:
         kind: build
-  - id: start
+
+  - id: start-web-server
     exec:
       label: "Start Symfony Web Server"
-      component: php
-      workingDir: ${PROJECTS_ROOT}/php-symfony
+      component: tools
+      workingDir: ${PROJECT_SOURCE}
       commandLine: "$HOME/.symfony/bin/symfony server:start"
       group:
         kind: run
-  - id: stop
+
+  - id: stop-web-server
     exec:
       label: "Stop Symfony Web Server"
-      component: php
-      workingDir: ${PROJECTS_ROOT}/php-symfony
+      component: tools
+      workingDir: ${PROJECT_SOURCE}
       commandLine: "$HOME/.symfony/bin/symfony server:stop"
       group:
         kind: run
